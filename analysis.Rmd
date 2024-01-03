@@ -1,0 +1,97 @@
+---
+title: "Human Microglial Inflammatory States in Alzheimer's Disease Progression"
+author: "Alba Rúbies & Clàudia Vicente"
+subtitle: Proteòmica
+output:
+  html_document:
+    theme: cosmo
+    highlight: pygments
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r setup, warning = FALSE, message = FALSE}
+library(ggplot2)
+library(pheatmap)
+```
+
+# Directories set-up
+```{r directory}
+path <- '/Volumes/TOSHIBA/4t/Proteòmica/Practiques/'
+workingDir <- file.path(path, 'Data/')
+resultsDir <- file.path(path, 'Results/')
+setwd(workingDir)
+```
+
+# Perseus files
+```{r files, message=FALSE, warning=FALSE}
+path_v <- file.path(workingDir, 'volcano_plot_LM2-MDA.txt')
+path_h <- file.path(workingDir, 'zscores_xheatmap_significants.txt')
+
+volcano_data <- read.csv(path_v, sep = "\t")
+heatmap_data <- read.csv(path_h, sep = "\t")
+```
+
+# Visualization
+## Volcano plot
+```{r volcano}
+volcano_data$DEPs <- "NORMAL"
+volcano_data$DEPs[volcano_data$Difference > 1 & volcano_data$X.Log.P.value. > -log10(0.05)] <- "UP"
+volcano_data$DEPs[volcano_data$Difference < -1 & volcano_data$X.Log.P.value. > -log10(0.05)] <- "DOWN"
+  
+ggplot(data = volcano_data, aes(x = Difference, y = X.Log.P.value., colour = DEPs)) +
+    geom_point(alpha = 0.4, size = 2) +
+    scale_color_manual(values = c("blue", "grey", "red")) +
+    geom_vline(xintercept = c(-1, 1), lty = 4, col = "black", lwd = 0.4) +
+    geom_hline(yintercept = -log10(0.05), lty = 4, col = "black", lwd = 0.4) +
+    labs(x = "log2(FC)", y = "-log10(q-value)", 
+         title = 'Volcano plot of differential expressed proteins across \n LM2 against MDA-MB-231 cell lines contrast') +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5), 
+          legend.position = "right", 
+          legend.title = element_blank())
+```
+
+## Heatmap
+```{r heatmap}
+h_matrix <- as.matrix(heatmap_data[,1:6])
+h_matrix[, 1] <- gsub(",", ".", h_matrix[, 1])
+h_matrix <- apply(h_matrix, 2, as.numeric)
+colnames(h_matrix) <- c("LM2 A", "LM2 B", "LM2 C", "MDA A", "MDA B", "MDA C")
+
+annotation <- data.frame(c.line = c(rep("LM2", 3), rep("MDA", 3)),
+                         rep = rep(c("A", "B", "C"), 2))
+annotation_colors <- list(
+  c.line = c("LM2" = "#79D899", "MDA" = "#BA79D8"),
+  rep = c("A" = "gray88", "B" = "gray55", "C" = "gray22"))
+
+pheatmap(
+  h_matrix,
+  annotation_col = annotation,  
+  annotation_colors = annotation_colors,
+  color = colorRampPalette(c("darkblue", "blue", "white", "red", "darkred"))(256),
+  scale = "row",
+  annotation_legend = TRUE, 
+  angle_col = "45",
+  main = "Heatmap of proteome changes across LM2 \n against MDA-MB-231 cell lines contrast")
+```
+
+# Save results
+```{r save results}
+up <- volcano_data[volcano_data[["DEPs"]] == "UP", ]
+up <- up[order(up$Difference, decreasing = TRUE), ]
+store = paste(resultsDir, 'up.tsv', sep='')
+write.table(up, file=store, quote=FALSE, sep='\t', col.names=NA)
+
+down <- volcano_data[volcano_data[["DEPs"]] == "DOWN", ]
+down <- down[order(down$Difference), ]
+store = paste(resultsDir, 'down.tsv', sep='')
+write.table(down, file=store, quote=FALSE, sep='\t', col.names=NA)
+```
