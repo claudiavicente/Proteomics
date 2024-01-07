@@ -182,4 +182,4 @@ This analysis has been done using the [STRING](https://string-db.org/) webpage. 
 ![STRING network colored by enriched GO-BP.](/Results/STRING/string_hires_image.png)
 
 ---
-![Enriched GO-BP results table and network color legend.](/Volumes/TOSHIBA/4t/Proteòmica/Practiques/Results/STRING/results_table.png)
+![Enriched GO-BP results table and network color legend.](/Results/STRING/results_table.png)
