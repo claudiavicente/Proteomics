@@ -179,7 +179,7 @@ write.table(down, file=store, quote=FALSE, sep='\t', col.names=NA)
 This analysis has been done using the [STRING](https://string-db.org/) webpage. We have used the top 50 upregulated proteins and the top 50 downregulated proteins obtained in the analysis, ordered by its fold-change. 
 **All parameters used on STRING are the default ones.**
 
-![STRING network colored by enriched GO-BP.](/Volumes/TOSHIBA/4t/Proteòmica/Practiques/Results/STRING/string_hires_image.png)
+![STRING network colored by enriched GO-BP.](/Results/STRING/string_hires_image.png)
 
 ---
 ![Enriched GO-BP results table and network color legend.](/Volumes/TOSHIBA/4t/Proteòmica/Practiques/Results/STRING/results_table.png)
